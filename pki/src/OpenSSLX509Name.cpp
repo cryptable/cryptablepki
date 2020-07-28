@@ -9,7 +9,7 @@
 #include "OpenSSLException.h"
 
 OpenSSLX509Name::OpenSSLX509Name(const std::string &name) : name{name} {
-    x509Name = parseName(name, MBSTRING_ASC);
+    parseName(name, MBSTRING_ASC);
 }
 
 OpenSSLX509Name::OpenSSLX509Name(const X509_NAME *x509Nm) {
@@ -31,21 +31,21 @@ OpenSSLX509Name::OpenSSLX509Name(const X509_NAME *x509Nm) {
  * @param chtype can be MBSTRING_ASC | MBSTRING_UTF8
  * @return
  */
-X509_NAME *OpenSSLX509Name::parseName(const std::string &name, int chtype)
+void OpenSSLX509Name::parseName(const std::string &name, int chtype)
 {
     const char *cp = name.c_str();
     int nextismulti = 0;
     char *work;
-    X509_NAME *n;
 
     if (*cp++ != '/') {
         throw OpenSSLException("name is expected to be in the format "
                                "/type0=value0/type1=value1/type2=... where characters may "
                                "be escaped by \\. This name is not in that format: '%s'\n");
     }
-    n = X509_NAME_new();
-    if (n == NULL)
-        return NULL;
+    x509Name = X509_NAME_new();
+    if (x509Name == NULL) {
+        throw std::bad_alloc();
+    }
     work = OPENSSL_strdup(cp);
     if (work == NULL)
         throw std::bad_alloc();
@@ -69,7 +69,7 @@ X509_NAME *OpenSSLX509Name::parseName(const std::string &name, int chtype)
         ++cp;
 
         /* Collect the value. */
-        valstr = (unsigned char *)bp;
+        valstr = (unsigned char *) bp;
         for (; *cp && *cp != '/'; *bp++ = *cp++) {
             if (*cp == '+') {
                 nextismulti = 1;
@@ -96,19 +96,15 @@ X509_NAME *OpenSSLX509Name::parseName(const std::string &name, int chtype)
             OPENSSL_free(work);
             throw OpenSSLException("No value provided for an attribute in name\n");
         }
-        if (!X509_NAME_add_entry_by_NID(n, nid, chtype,
-                                        valstr, strlen((char *)valstr),
-                                        -1, ismulti ? -1 : 0))
-            goto err;
+        if (!X509_NAME_add_entry_by_NID(x509Name, nid, chtype,
+                                        valstr, strlen((char *) valstr),
+                                        -1, ismulti ? -1 : 0)) {
+            OPENSSL_free(work);
+            throw OpenSSLException("No value provided for an attribute in name\n");
+        }
     }
 
     OPENSSL_free(work);
-    return n;
-
-    err:
-    X509_NAME_free(n);
-    OPENSSL_free(work);
-    return NULL;
 }
 
 OpenSSLX509Name::~OpenSSLX509Name() {

@@ -25,6 +25,8 @@ private:
     EVP_PKEY *keyPair;
 
     std::unique_ptr<OpenSSLCertificate> caCertificate;
+
+    long serialNumber;
 };
 
 

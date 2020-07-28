@@ -36,7 +36,7 @@ public:
     ~OpenSSLX509Name();
     
 private:
-    X509_NAME *parseName(const std::string &name, int chtype);
+    void parseName(const std::string &name, int chtype);
 
     X509_NAME *x509Name;
 

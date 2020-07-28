@@ -22,23 +22,6 @@ public:
 
     const X509 *getX509() const;
 
-#if 0
-    std::string getSerialNumber();
-
-    std::string getSubjectName();
-
-    std::string getIssuerName();
-
-    std::string getCertificatePEM();
-
-    std::string getCertificateDER();
-
-//    std::unique_ptr<X509_NAME> parseName(const std::string &name);
-
-//    std::unique_ptr<X509> certificate;
-
-    std::string serialNumber;
-#endif
 private:
     X509 *x509Certificate;
 };
