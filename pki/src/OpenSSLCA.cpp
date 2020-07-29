@@ -4,6 +4,8 @@
  * Author: "David Tillemans"
  * Date: 20/07/2020
  */
+#include <memory>
+#include <functional>
 #include <openssl/x509v3.h>
 #include "OpenSSLCA.h"
 #include "OpenSSLX509Name.h"

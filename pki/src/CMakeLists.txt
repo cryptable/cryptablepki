@@ -13,10 +13,11 @@ set_target_properties(cryptablepki PROPERTIES PUBLIC_HEADER
 
 target_include_directories(cryptablepki PUBLIC "${PROJECT_BINARY_DIR}")
 
-install(cryptablepki
+install(TARGETS cryptablepki
         LIBRARY
             DESTINATION lib)
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
         COMPONENT devel
         DESTINATION include
         FILES_MATCHING PATTERN "*.h")
