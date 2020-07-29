@@ -28,8 +28,9 @@ def install_catch2():
     return
 
 def vs_env_dict():
-    vsvar64 = '{vscomntools}vsvars64.bat'.format(vscomntools=os.environ['VS140COMNTOOLS'])
-    cmd = [vsvar64, '&&', 'set']
+    # "C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\Common7\Tools\VsDevCmd.bat" -arch=amd64
+    vsvar64 = '{vscomntools}VsDevCmd.bat'.format(vscomntools=os.environ['VS150COMNTOOLS'])
+    cmd = [vsvar64, '-arch=amd64', '&&', 'set']
     popen = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = popen.communicate()
     if popen.wait() != 0:
@@ -51,7 +52,7 @@ def install_openssl_win32():
         subprocess.run('git pull', shell=True)
         os.chdir("..")
 
-    openssl_build_env = [ **os.environ ]
+    openssl_build_env = os.environ.copy()
     # Visual Studio Setup
     openssl_build_env.update(vs_env_dict())
 
@@ -80,12 +81,16 @@ def install_openssl_win32():
 
     # OpenSSL
     os.chdir("openssl")
-    subprocess.run('git fetch --all --tags', shell=True)
-    subprocess.run('git checkout OpenSSL_1_1_1-stable', shell=True)
-    subprocess.popen('perl Configure --prefix="' get_common_dir() + '" --openssldir="' + get_common_dir() + '" no-ssl2 no-ssl3 VC-WIN64A', env=openssl_build_env)
-    subprocess.popen('nmake', env=openssl_build_env)
-    subprocess.popen('nmake test', env=openssl_build_env)
-    subprocess.popen('nmake install', env=openssl_build_env)
+    pwait = subprocess.run('git fetch --all --tags', shell=True)
+    pwait = subprocess.run('git checkout OpenSSL_1_1_1-stable', shell=True)
+    pwait = subprocess.Popen('perl Configure --prefix="' + get_common_dir() + '" --openssldir="' + get_common_dir() + '" no-ssl2 no-ssl3 VC-WIN64A', env=openssl_build_env)
+    pwait.wait()
+    pwait = subprocess.Popen('nmake', env=openssl_build_env)
+    pwait.wait()
+    pwait = subprocess.Popen('nmake test', env=openssl_build_env)
+    pwait.wait()
+    pwait = subprocess.Popen('nmake install', env=openssl_build_env)
+    pwait.wait()
     os.chdir("..")
     return
 
@@ -115,8 +120,10 @@ def run_scripts():
     os.chdir("3rd-party")
     install_catch2()
     if os.name == 'nt':
+        print('running windows setup')
         install_openssl_win32()
-    else
+    else:
+        print('running linux setup')
         install_openssl()
     os.chdir("..")
     return
