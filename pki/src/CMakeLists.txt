@@ -8,9 +8,6 @@ add_library(cryptablepki
         OpenSSLException.h
         OpenSSLX509Name.cpp OpenSSLX509Name.h)
 
-set_target_properties(cryptablepki PROPERTIES PUBLIC_HEADER
-        "OpenSSLInit.h;OpenSSLCA.h")
-
 target_include_directories(cryptablepki PUBLIC "${PROJECT_BINARY_DIR}")
 
 install(TARGETS cryptablepki
