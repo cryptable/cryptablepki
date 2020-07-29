@@ -1,0 +1,23 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: setup development environment
+      run: python3 1-setup-dev.py
+    - name: build the make file
+      run: cd pki && mkdir build && cd build && cmake ..
+    - name: build the library
+      run: cmake --build .
+    - name: run unittests of library
+      run: ./test/tests
