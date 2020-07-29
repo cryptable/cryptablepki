@@ -5,9 +5,9 @@ project(cryptablepki VERSION 0.1)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-if(not DEFINED COMMON_DIR)
+if(NOT DEFINED COMMON_DIR)
     set(COMMON_DIR "${CMAKE_SOURCE_DIR}/../common")
-endif(not COMMON_DIR)
+endif(NOT DEFINED COMMON_DIR)
 
 SET(OPENSSL_ROOT_DIR ${COMMON_DIR})
 find_package(OpenSSL)
