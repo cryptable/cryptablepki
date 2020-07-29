@@ -8,15 +8,12 @@ add_library(cryptablepki
         OpenSSLException.h
         OpenSSLX509Name.cpp OpenSSLX509Name.h)
 
-set_target_properties(cryptablepki PROPERTIES PUBLIC_HEADER
-        "OpenSSLInit.h;OpenSSLCA.h")
-
 target_include_directories(cryptablepki PUBLIC "${PROJECT_BINARY_DIR}")
 
-install(cryptablepki
+install(TARGETS cryptablepki
         LIBRARY
             DESTINATION lib)
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src
         COMPONENT devel
         DESTINATION include
         FILES_MATCHING PATTERN "*.h")
