@@ -6,6 +6,7 @@
  */
 #include "OpenSSLCertificateRequest.h"
 #include <openssl/err.h>
+#include <openssl/pem.h>
 #include "OpenSSLException.h"
 #include "OpenSSLCertificate.h"
 #include "OpenSSLX509Name.h"
@@ -16,6 +17,17 @@ OpenSSLCertificateRequest::OpenSSLCertificateRequest(const char *req, size_t req
         throw OpenSSLException(ERR_get_error());
     }
 }
+
+OpenSSLCertificateRequest::OpenSSLCertificateRequest(const std::string &pemRequest) {
+    BIO *pemBIO = BIO_new_mem_buf(pemRequest.data(), pemRequest.size());
+    if (pemBIO == NULL) {
+        throw std::bad_alloc();
+    }
+    certificateRequest = PEM_read_bio_X509_REQ(pemBIO, NULL, NULL, NULL);
+
+    BIO_free(pemBIO);
+}
+
 
 OpenSSLCertificateRequest::OpenSSLCertificateRequest(const std::string &dname, size_t bitLength): keyPair{NULL} {
 

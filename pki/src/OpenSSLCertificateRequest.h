@@ -13,6 +13,8 @@
 class OpenSSLCertificateRequest {
 
 public:
+    OpenSSLCertificateRequest(const std::string &pemRequest);
+
     OpenSSLCertificateRequest(const char *req, size_t reqLg);
 
     OpenSSLCertificateRequest(const std::string &dname, size_t bitLength);
