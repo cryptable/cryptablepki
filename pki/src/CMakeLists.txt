@@ -1,6 +1,6 @@
 
 # add the executable
-add_library(cryptablepki
+add_library(cryptablepki STATIC
         OpenSSLInit.cpp OpenSSLInit.h
         OpenSSLCA.cpp OpenSSLCA.h
         OpenSSLCertificate.cpp OpenSSLCertificate.h

@@ -4,7 +4,7 @@
  * Author: "David Tillemans"
  * Date: 21/07/2020
  */
-
+#include <cstring>
 #include "OpenSSLX509Name.h"
 #include "OpenSSLException.h"
 
