@@ -21,6 +21,7 @@ if(OPENSSL_FOUND)
 endif(OPENSSL_FOUND)
 
 include_directories(include src ${COMMON_DIR}/include)
+set(CMAKE_DEBUG_POSTFIX d)
 
 add_subdirectory(src)
 add_subdirectory(test)
