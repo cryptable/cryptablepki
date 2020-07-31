@@ -14,13 +14,17 @@
 class OpenSSLCertificate {
 
 public:
-    OpenSSLCertificate(const X509 *x509);
+    OpenSSLCertificate();
 
-    bool verify(const OpenSSLCertificate *issuerCA) const;
+    OpenSSLCertificate(const X509 *x509);
 
     ~OpenSSLCertificate();
 
+    bool verify(const OpenSSLCertificate *issuerCA) const;
+
     const X509 *getX509() const;
+
+    const std::string getPEM();
 
 private:
     X509 *x509Certificate;

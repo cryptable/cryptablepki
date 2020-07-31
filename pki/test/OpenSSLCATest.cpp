@@ -32,6 +32,7 @@ TEST_CASE( "OpenSSLCATests", "[success]" ) {
 
         // Assert
         REQUIRE(certificate->verify(openSslca.getCertificate()));
+//        std::cout << certificate->getPEM();
     }
 }
 

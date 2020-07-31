@@ -6,8 +6,13 @@
  */
 
 #include <openssl/err.h>
+#include <openssl/pem.h>
 #include "OpenSSLCertificate.h"
 #include "OpenSSLException.h"
+
+OpenSSLCertificate::OpenSSLCertificate() {
+    // TODO: create Selfsigned certificate
+}
 
 OpenSSLCertificate::OpenSSLCertificate(const X509 *x509) {
     x509Certificate = X509_dup((X509 *)x509);
@@ -32,6 +37,19 @@ bool OpenSSLCertificate::verify(const OpenSSLCertificate *issuerCA) const {
 
 const X509* OpenSSLCertificate::getX509() const {
     return x509Certificate;
+}
+
+const std::string OpenSSLCertificate::getPEM() {
+    BIO *bioMem = BIO_new(BIO_s_mem());
+
+    if (!PEM_write_bio_X509(bioMem, x509Certificate)) {
+        throw OpenSSLException(ERR_get_error());
+    }
+    char *pem;
+    long len = BIO_get_mem_data(bioMem, &pem);
+    std::string pemString(pem, len);
+    BIO_free(bioMem);
+    return pemString;
 }
 
 OpenSSLCertificate::~OpenSSLCertificate() {
