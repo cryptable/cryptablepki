@@ -20,4 +20,4 @@ jobs:
     - name: build the library
       run: cd pki && cd build && cmake --build .
     - name: run unittests of library
-      run: cd pki && mkdir build && cd build && ./test/tests
+      run: cd pki && cd build && ./test/tests
