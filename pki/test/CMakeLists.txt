@@ -5,7 +5,7 @@ add_executable (tests main.cpp
         OpenSSLCertificateRequestTest.cpp)
 
 # set_target_properties(tests PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${COMMON_DIR}/bin )
-target_link_libraries(tests ${OPENSSL_CRYPTO_LIBRARY} ${OPENSSL_SSL_LIBRARY} cryptablepki)
+target_link_libraries(tests cryptablepki ${OPENSSL_CRYPTO_LIBRARY} ${OPENSSL_SSL_LIBRARY})
 
 enable_testing()
 add_test(testing tests)
