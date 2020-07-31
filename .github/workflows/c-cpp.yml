@@ -15,9 +15,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: setup development environment
       run: python3 1-setup-dev.py
-    - name: build the make file
-      run: cd pki && mkdir build && cd build && cmake ..
     - name: build the library
-      run: cmake --build .
+      run: cd pki && mkdir build && cd build && cmake .. && cmake --build .
     - name: run unittests of library
-      run: ./test/tests
+      run: cd pki && cd build && ./test/tests
