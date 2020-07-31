@@ -1,3 +1,5 @@
+![C/C++ CI](https://github.com/cryptable/cryptablepki/workflows/C/C++%20CI/badge.svg)
+
 Compilation
 -----------
 
