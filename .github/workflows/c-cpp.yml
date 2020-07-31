@@ -18,6 +18,6 @@ jobs:
     - name: build the make file
       run: cd pki && mkdir build && cd build && cmake ..
     - name: build the library
-      run: cd pki && mkdir build && cd build && cmake --build .
+      run: cd pki && cd build && cmake --build .
     - name: run unittests of library
       run: cd pki && mkdir build && cd build && ./test/tests
