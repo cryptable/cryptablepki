@@ -10,24 +10,48 @@
 #include <stdexcept>
 #include <openssl/err.h>
 
+/**
+ * General Exception class, which tries to retrieve the error message from openssl errorcode
+ */
 class OpenSSLException : public std::exception {
 
 public:
+    /**
+     * Constructor which needs the openssl error code
+     * @param error the error code, which can be given using the function ERR_get_error() or the return code from the
+     * openssl function
+     */
     OpenSSLException(unsigned long error) : errorCode{error} {
         errorMessage = ERR_error_string(error, NULL);
     };
 
+    /**
+     * Non standard openssl errors, can use this interface and give the message as a string. The error code = 0x90010001
+     * @param message error message as a standard string
+     */
     OpenSSLException(const std::string &message) : errorCode{0x90010001}, errorMessage{message} {
     };
 
+    /**
+     * Return the error code
+     * @return
+     */
     unsigned long code() {
         return errorCode;
     };
 
-    virtual char const * what() const noexcept {
+    /**
+     * Implements the standard insterface of std::exception
+     * @return
+     */
+    virtual char const * what() const noexcept override {
         return errorMessage.c_str();
     };
 
+    /**
+     * return the error message as in the what().
+     * @return
+     */
     operator std::string() const { return errorMessage; };
 
 private:

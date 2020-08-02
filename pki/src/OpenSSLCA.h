@@ -10,15 +10,36 @@
 #include "OpenSSLCertificate.h"
 #include "OpenSSLCertificateRequest.h"
 
+/**
+ * The Certification Authority class. This will function as your Certification Authority.
+ */
 class OpenSSLCA {
 
 public:
+    /**
+     * Create a selfsigned RSA Root Certification Authority
+     * @param rootName
+     * @param bitLength
+     */
     OpenSSLCA(const std::string &rootName, int bitLength);
 
+    /**
+     * Certify a certificate request object to a Certificate. The certification request andcertificate class contains
+     * all the conversion function (DER, PEM, ...)
+     * @param certificateRequest a certificate request object
+     * @return a certificate as an OpenSSLCertificate object
+     */
     std::unique_ptr<OpenSSLCertificate> certify(const OpenSSLCertificateRequest *certificateRequest);
 
+    /**
+     * Get the Certification Authority certificate of the object
+     * @return a certificate as an OpenSSLCertificate object
+     */
     const OpenSSLCertificate *getCertificate();
 
+    /**
+     * Destructor freeing the OpenSSL structures
+     */
     ~OpenSSLCA();
 
 private:

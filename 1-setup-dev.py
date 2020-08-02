@@ -28,6 +28,7 @@ def install_catch2():
     return
 
 def vs_env_dict():
+    # TODO: Visual Studio detection
     # "C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\Common7\Tools\VsDevCmd.bat" -arch=amd64
     vsvar64 = '{vscomntools}VsDevCmd.bat'.format(vscomntools=os.environ['VS150COMNTOOLS'])
     cmd = [vsvar64, '-arch=amd64', '&&', 'set']
