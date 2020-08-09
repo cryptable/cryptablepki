@@ -28,9 +28,8 @@ def install_catch2():
     return
 
 def vs_env_dict():
-    # TODO: Visual Studio detection
     # "C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\Common7\Tools\VsDevCmd.bat" -arch=amd64
-    vsvar64 = '{vscomntools}VsDevCmd.bat'.format(vscomntools=os.environ['VS150COMNTOOLS'])
+    vsvar64 = '{vscomntools}\\VsDevCmd.bat'.format(vscomntools=os.environ['VS150COMNTOOLS'])
     cmd = [vsvar64, '-arch=amd64', '&&', 'set']
     popen = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = popen.communicate()
@@ -38,7 +37,6 @@ def vs_env_dict():
         raise ValueError(stderr.decode("mbcs")) 
     output = stdout.decode("mbcs").split("\r\n")
     return dict((e[0].upper(), e[1]) for e in [p.rstrip().split("=", 1) for p in output] if len(e) == 2)
-
 
 def append_gitignore(file_to_ignore):
     with open('.gitignore', 'a+') as gitignore:
@@ -84,14 +82,56 @@ def install_openssl_win32():
     os.chdir("openssl")
     pwait = subprocess.run('git fetch --all --tags', shell=True)
     pwait = subprocess.run('git checkout OpenSSL_1_1_1-stable', shell=True)
-    pwait = subprocess.Popen('perl Configure --prefix="' + get_common_dir() + '" --openssldir="' + get_common_dir() + '" no-ssl2 no-ssl3 no-shared VC-WIN64A', env=openssl_build_env)
-    pwait.wait()
-    pwait = subprocess.Popen('nmake', env=openssl_build_env)
-    pwait.wait()
-    pwait = subprocess.Popen('nmake test', env=openssl_build_env)
-    pwait.wait()
-    pwait = subprocess.Popen('nmake install', env=openssl_build_env)
-    pwait.wait()
+    # DEBUG version
+    # pwait = subprocess.Popen(['perl', 'Configure', 'no-ssl2', 'no-ssl3', 'no-asm', 'no-shared', '-d', 'disable-capieng',
+    #     '--prefix=' + get_common_dir(), '--openssldir=' + get_common_dir(), 
+    #     'VC-WIN64A'], env=openssl_build_env, shell=True)
+    # if (pwait.wait()):
+    #     sys.exit(pwait.returncode)
+    # pwait = subprocess.Popen(['nmake', 'clean'], env=openssl_build_env, shell=True)
+    # if (pwait.wait()):
+    #     sys.exit(pwait.returncode)
+    # pwait = subprocess.Popen(['nmake'], env=openssl_build_env, shell=True)
+    # if (pwait.wait()):
+    #     sys.exit(pwait.returncode)
+    # pwait = subprocess.Popen(['nmake', 'install'], env=openssl_build_env, shell=True)
+    # if (pwait.wait()):
+    #     sys.exit(pwait.returncode)
+    # if (os.path.isfile(get_common_dir() + '/bin/openssld.exe')):
+    #     os.remove(get_common_dir() + '/bin/openssld.exe')
+    # os.rename(get_common_dir() + '/bin/openssl.exe', get_common_dir() + '/bin/openssld.exe')
+    # if (os.path.isfile(get_common_dir() + '/lib/libcryptod.lib')):
+    #     os.remove(get_common_dir() + '/lib/libcryptod.lib')
+    # os.rename(get_common_dir() + '/lib/libcrypto.lib', get_common_dir() + '/lib/libcryptod.lib')
+    # if (os.path.isfile(get_common_dir() + '/lib/libssld.lib')):
+    #     os.remove(get_common_dir() + '/lib/libssld.lib')
+    # os.rename(get_common_dir() + '/lib/libssl.lib', get_common_dir() + '/lib/libssld.lib')
+    # Release
+    pwait = subprocess.Popen(['perl', 'Configure', 'no-ssl2', 'no-ssl3', 'no-asm', 'no-shared', 'disable-capieng',
+        '--prefix=' + get_common_dir(), '--openssldir=' + get_common_dir(), 
+        'VC-WIN64A'], env=openssl_build_env, shell=True)
+    if (pwait.wait()):
+        sys.exit(pwait.returncode)
+    pwait = subprocess.Popen(['nmake', 'clean'], env=openssl_build_env, shell=True)
+    if (pwait.wait()):
+        sys.exit(pwait.returncode)
+    pwait = subprocess.Popen(['nmake'], env=openssl_build_env, shell=True)
+    if (pwait.wait()):
+        sys.exit(pwait.returncode)
+    pwait = subprocess.Popen(['nmake', 'test'], env=openssl_build_env, shell=True)
+    if (pwait.wait()):
+        print('------------------ WARNING: Investigate TEST errors: see failed-tests.log ----------------')
+        log = open('failed-tests.log', 'w')
+        openssl_build_env['V']='1'
+        openssl_build_env['TESTS']='test_verify'
+        pwait = subprocess.Popen(['nmake', 'test'], env=openssl_build_env, stdout=log, shell=True)
+        pwait.wait()
+        log.flush()
+        log.close()
+        print('------------------ WARNING: Investigate TEST errors ----------------')
+    pwait = subprocess.Popen(['nmake', 'install'], env=openssl_build_env, shell=True)
+    if (pwait.wait()):
+        sys.exit(pwait.returncode)
     os.chdir("..")
     return
 
@@ -107,7 +147,7 @@ def install_openssl():
     os.chdir("openssl")
     subprocess.run('git fetch --all --tags', shell=True)
     subprocess.run('git checkout OpenSSL_1_1_1-stable', shell=True)
-    subprocess.run('./config --prefix=' + get_common_dir() + ' --openssldir=' + get_common_dir() + ' no-ssl2 no-ssl3 no-shared -d', shell=True)
+    subprocess.run('./config --prefix=' + get_common_dir() + ' --openssldir=' + get_common_dir() + ' no-ssl2 no-ssl3 no-shared', shell=True)
     subprocess.run('make', shell=True)
     subprocess.run('make test', shell=True)
     subprocess.run('make install', shell=True)

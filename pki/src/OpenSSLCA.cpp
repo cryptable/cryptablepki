@@ -14,32 +14,7 @@
 #define FIVE_YEARS   (5*365 + 1)
 #define ONE_YEAR     365
 
-OpenSSLCA::OpenSSLCA(const std::string &rootName, int bitLength) : keyPair{NULL}, serialNumber{1L} {
-
-    // TODO: Refactor Generate the Key (also in OpenSSLCertificateRequest DRY)
-    EVP_PKEY_CTX *ctx = NULL;
-    ctx = EVP_PKEY_CTX_new_id(EVP_PKEY_RSA, NULL);
-    if (ctx == NULL) {
-        throw std::bad_alloc();
-    }
-    int status = 0;
-    if ((status = EVP_PKEY_keygen_init(ctx)) <= 0) {
-        EVP_PKEY_CTX_free(ctx);
-        throw OpenSSLException(status);
-    }
-     if ((status = RSA_pkey_ctx_ctrl(ctx,
-             EVP_PKEY_OP_KEYGEN,
-             EVP_PKEY_CTRL_RSA_KEYGEN_BITS,
-             bitLength, NULL)) <= 0) {
-        EVP_PKEY_CTX_free(ctx);
-        throw OpenSSLException(status);
-    }
-
-    if ((status = EVP_PKEY_keygen(ctx, &keyPair)) <= 0) {
-        EVP_PKEY_CTX_free(ctx);
-        throw OpenSSLException(status);
-    }
-    EVP_PKEY_CTX_free(ctx);
+OpenSSLCA::OpenSSLCA(const std::string &rootName, int bitLength) : serialNumber{1L}, keyPair(bitLength) {
 
     // TODO: Create the Certificate
     auto x509Certificate = std::unique_ptr<X509,std::function<void(X509 *ptr)>>(X509_new(), X509_free );
@@ -67,7 +42,8 @@ OpenSSLCA::OpenSSLCA(const std::string &rootName, int bitLength) : keyPair{NULL}
         throw OpenSSLException(ERR_get_error());
     }
 
-    if (!X509_set_pubkey(x509Certificate.get(), keyPair)) {
+    if (!X509_set_pubkey(x509Certificate.get(),
+                         const_cast<EVP_PKEY *>(keyPair.getKeyPair()))) {
         throw OpenSSLException(ERR_get_error());
     }
 
@@ -107,7 +83,7 @@ OpenSSLCA::OpenSSLCA(const std::string &rootName, int bitLength) : keyPair{NULL}
     }
     const EVP_MD *md = EVP_sha256();
     EVP_PKEY_CTX *pkctx = NULL;
-    if (!EVP_DigestSignInit(mdctx.get(), &pkctx, md, NULL, keyPair)) {
+    if (!EVP_DigestSignInit(mdctx.get(), &pkctx, md, NULL, const_cast<EVP_PKEY *>(keyPair.getKeyPair()))) {
         throw OpenSSLException(ERR_get_error());
     }
     if (!X509_sign_ctx(x509Certificate.get(), mdctx.get())) {
@@ -132,14 +108,13 @@ std::unique_ptr<OpenSSLCertificate> OpenSSLCA::certify(const OpenSSLCertificateR
         throw OpenSSLException(ERR_get_error());
     }
 
-    // TODO: Sign Certificate
     auto mdctx = std::unique_ptr<EVP_MD_CTX,std::function<void(EVP_MD_CTX *ptr)>>(EVP_MD_CTX_new(), EVP_MD_CTX_free );
     if (!mdctx) {
         throw std::bad_alloc();
     }
     const EVP_MD *md = EVP_sha256();
     EVP_PKEY_CTX *pkctx = NULL;
-    if (!EVP_DigestSignInit(mdctx.get(), &pkctx, md, NULL, keyPair)) {
+    if (!EVP_DigestSignInit(mdctx.get(), &pkctx, md, NULL, const_cast<EVP_PKEY *>(keyPair.getKeyPair()))) {
         throw OpenSSLException(ERR_get_error());
     }
     if (!X509_sign_ctx(x509Certificate.get(), mdctx.get())) {
@@ -157,5 +132,4 @@ const OpenSSLCertificate * OpenSSLCA::getCertificate() {
 }
 
 OpenSSLCA::~OpenSSLCA() {
-    EVP_PKEY_free(keyPair);
 }

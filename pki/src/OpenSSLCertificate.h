@@ -26,6 +26,8 @@ public:
 
     const std::string getPEM();
 
+    const std::string getCommonName();
+
 private:
     X509 *x509Certificate;
 };

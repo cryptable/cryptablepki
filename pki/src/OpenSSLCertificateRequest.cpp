@@ -29,32 +29,7 @@ OpenSSLCertificateRequest::OpenSSLCertificateRequest(const std::string &pemReque
 }
 
 
-OpenSSLCertificateRequest::OpenSSLCertificateRequest(const std::string &dname, size_t bitLength): keyPair{NULL} {
-
-    // TODO: Refactor Generate the Key (also in OpenSSLCA DRY)
-    EVP_PKEY_CTX *ctx = NULL;
-    ctx = EVP_PKEY_CTX_new_id(EVP_PKEY_RSA, NULL);
-    if (ctx == NULL) {
-        throw std::bad_alloc();
-    }
-    int status = 0;
-    if ((status = EVP_PKEY_keygen_init(ctx)) <= 0) {
-        EVP_PKEY_CTX_free(ctx);
-        throw OpenSSLException(status);
-    }
-    if ((status = RSA_pkey_ctx_ctrl(ctx,
-                                    EVP_PKEY_OP_KEYGEN,
-                                    EVP_PKEY_CTRL_RSA_KEYGEN_BITS,
-                                    bitLength, NULL)) <= 0) {
-        EVP_PKEY_CTX_free(ctx);
-        throw OpenSSLException(status);
-    }
-
-    if ((status = EVP_PKEY_keygen(ctx, &keyPair)) <= 0) {
-        EVP_PKEY_CTX_free(ctx);
-        throw OpenSSLException(status);
-    }
-    EVP_PKEY_CTX_free(ctx);
+OpenSSLCertificateRequest::OpenSSLCertificateRequest(const std::string &dname, size_t bitLength): keyPair(bitLength) {
 
     certificateRequest = X509_REQ_new();
     if (certificateRequest == NULL) {
@@ -62,9 +37,8 @@ OpenSSLCertificateRequest::OpenSSLCertificateRequest(const std::string &dname, s
     }
     OpenSSLX509Name subjectName(dname.c_str());
     X509_REQ_set_subject_name(certificateRequest, subjectName.getX509Name());
-    X509_REQ_set_pubkey(certificateRequest, keyPair);
+    X509_REQ_set_pubkey(certificateRequest, const_cast<EVP_PKEY *>(keyPair.getKeyPair()));
     X509_REQ_set_version(certificateRequest, 0L);
-    // TODO: copy the extensions
 
     // TODO: Sign Certificate Request (Almost Identical as OpenSSLCA class DRY)
     EVP_MD_CTX *mdctx = EVP_MD_CTX_new();
@@ -73,7 +47,7 @@ OpenSSLCertificateRequest::OpenSSLCertificateRequest(const std::string &dname, s
     }
     const EVP_MD *md = EVP_sha256();
     EVP_PKEY_CTX *pkctx = NULL;
-    if (!EVP_DigestSignInit(mdctx, &pkctx, md, NULL, keyPair)) {
+    if (!EVP_DigestSignInit(mdctx, &pkctx, md, NULL, const_cast<EVP_PKEY *>(keyPair.getKeyPair()))) {
         throw OpenSSLException(ERR_get_error());
     }
     if (!X509_REQ_sign_ctx(certificateRequest, mdctx)) {

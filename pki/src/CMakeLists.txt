@@ -1,16 +1,18 @@
 
 # add the executable
-add_library(cryptablepki STATIC
+add_library(${LIBRARY_NAME} STATIC
         OpenSSLInit.cpp OpenSSLInit.h
         OpenSSLCA.cpp OpenSSLCA.h
         OpenSSLCertificate.cpp OpenSSLCertificate.h
         OpenSSLCertificateRequest.cpp OpenSSLCertificateRequest.h
         OpenSSLException.h
-        OpenSSLX509Name.cpp OpenSSLX509Name.h)
+        OpenSSLX509Name.cpp OpenSSLX509Name.h
+        OpenSSLPKCS12.cpp OpenSSLPKCS12.h
+        OpenSSLKey.cpp OpenSSLKey.h)
 
-target_include_directories(cryptablepki PUBLIC "${PROJECT_BINARY_DIR}")
+target_include_directories(${LIBRARY_NAME} PUBLIC "${PROJECT_BINARY_DIR}")
 
-install(TARGETS cryptablepki
+install(TARGETS ${LIBRARY_NAME}
         LIBRARY
             DESTINATION lib)
 

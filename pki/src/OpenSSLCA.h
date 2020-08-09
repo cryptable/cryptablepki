@@ -9,6 +9,7 @@
 #include <string>
 #include "OpenSSLCertificate.h"
 #include "OpenSSLCertificateRequest.h"
+#include "OpenSSLKey.h"
 
 /**
  * The Certification Authority class. This will function as your Certification Authority.
@@ -43,7 +44,8 @@ public:
     ~OpenSSLCA();
 
 private:
-    EVP_PKEY *keyPair;
+
+    OpenSSLKey keyPair;
 
     std::unique_ptr<OpenSSLCertificate> caCertificate;
 

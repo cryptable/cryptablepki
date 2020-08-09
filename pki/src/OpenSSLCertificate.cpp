@@ -55,3 +55,15 @@ const std::string OpenSSLCertificate::getPEM() {
 OpenSSLCertificate::~OpenSSLCertificate() {
     X509_free(x509Certificate);
 }
+
+const std::string OpenSSLCertificate::getCommonName() {
+    X509_NAME *x509Name = X509_get_subject_name(x509Certificate);
+    int lastpos = -1;
+    lastpos = X509_NAME_get_index_by_NID(x509Name, NID_commonName, lastpos);
+    if (lastpos != 0) {
+        throw OpenSSLException(ERR_get_error());
+    }
+    X509_NAME_ENTRY *x509NameEntry = X509_NAME_get_entry(x509Name, lastpos);
+    ASN1_STRING *data = X509_NAME_ENTRY_get_data(x509NameEntry);
+    return std::string((char *)ASN1_STRING_get0_data(data), ASN1_STRING_length(data));
+}

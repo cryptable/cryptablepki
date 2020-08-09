@@ -9,6 +9,7 @@
 #define OPENSSLCERTIFICATEREQUEST_H
 #include <openssl/x509.h>
 #include <string>
+#include "OpenSSLKey.h"
 
 class OpenSSLCertificateRequest {
 
@@ -26,7 +27,7 @@ public:
     ~OpenSSLCertificateRequest();
 
 private:
-    EVP_PKEY *keyPair;
+    OpenSSLKey keyPair;
 
     X509_REQ *certificateRequest = NULL;
 };
