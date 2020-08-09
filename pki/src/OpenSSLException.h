@@ -8,6 +8,7 @@
 #ifndef OPENSSLEXCEPTION_H
 #define OPENSSLEXCEPTION_H
 #include <stdexcept>
+#include <string>
 #include <openssl/err.h>
 
 /**

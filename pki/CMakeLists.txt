@@ -27,6 +27,9 @@ else(CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(LIBRARY_NAME  "${CMAKE_PROJECT_NAME}")
 endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 
+if (WIN32)
+    set(WINDOWS_LIBS ws2_32.lib)
+endif (WIN32)
 
 add_subdirectory(src)
 add_subdirectory(test)

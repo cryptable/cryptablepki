@@ -9,8 +9,8 @@
 #include "OpenSSLKey.h"
 #include "OpenSSLException.h"
 
-OpenSSLKey::OpenSSLKey() : bitLength{2048} {
-    OpenSSLKey(bitLength);
+OpenSSLKey::OpenSSLKey() {
+    OpenSSLKey(2048);
 }
 
 OpenSSLKey::OpenSSLKey(size_t keyBitLength) : bitLength{keyBitLength}, keyPair{nullptr} {
