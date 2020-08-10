@@ -32,7 +32,7 @@ OpenSSLCA::OpenSSLCA(const std::string &rootName, int bitLength) : serialNumber{
     if (!asn1SerialNumber) {
         throw std::bad_alloc();
     }
-    ASN1_INTEGER_set(asn1SerialNumber.get(), serialNumber);
+    ASN1_INTEGER_set(asn1SerialNumber.get(), serialNumber++);
     X509_set_serialNumber(x509Certificate.get(), asn1SerialNumber.get());
     serialNumber++;
     if (X509_gmtime_adj(X509_getm_notBefore(x509Certificate.get()), 0) == NULL) {
@@ -46,7 +46,6 @@ OpenSSLCA::OpenSSLCA(const std::string &rootName, int bitLength) : serialNumber{
                          const_cast<EVP_PKEY *>(keyPair.getKeyPair()))) {
         throw OpenSSLException(ERR_get_error());
     }
-
     X509_EXTENSION *basicConstraint = X509V3_EXT_conf_nid(NULL,
             NULL,
             NID_basic_constraints,
@@ -67,14 +66,6 @@ OpenSSLCA::OpenSSLCA(const std::string &rootName, int bitLength) : serialNumber{
     if (!X509_add_ext(x509Certificate.get(), keyUsage, -1)) {
         throw OpenSSLException(ERR_get_error());
     }
-
-#if 0 // Basic Constraint
-    BASIC_CONSTRAINTS *bc;
-    i2d_ASN1_INTEGER()
-    i2d_BASIC_CONSTRAINTS(bs,)
-    // NID_basic_constraints
-    X509_add1_ext_i2d(x509Certificate, NID_basic_constraints, , 1, )
-#endif
 
     // TODO: Sign Certificate
     auto mdctx = std::unique_ptr<EVP_MD_CTX,std::function<void(EVP_MD_CTX *ptr)>>(EVP_MD_CTX_new(), EVP_MD_CTX_free );
@@ -107,6 +98,12 @@ std::unique_ptr<OpenSSLCertificate> OpenSSLCA::certify(const OpenSSLCertificateR
     if (X509_time_adj_ex(X509_getm_notAfter(x509Certificate.get()), ONE_YEAR, 0, NULL) == NULL) {
         throw OpenSSLException(ERR_get_error());
     }
+    auto asn1SerialNumber = std::unique_ptr<ASN1_INTEGER,std::function<void(ASN1_INTEGER *ptr)>>(ASN1_INTEGER_new(), ASN1_INTEGER_free );
+    if (!asn1SerialNumber) {
+        throw std::bad_alloc();
+    }
+    ASN1_INTEGER_set(asn1SerialNumber.get(), serialNumber++);
+    X509_set_serialNumber(x509Certificate.get(), asn1SerialNumber.get());
 
     auto mdctx = std::unique_ptr<EVP_MD_CTX,std::function<void(EVP_MD_CTX *ptr)>>(EVP_MD_CTX_new(), EVP_MD_CTX_free );
     if (!mdctx) {
