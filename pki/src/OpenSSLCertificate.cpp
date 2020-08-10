@@ -10,8 +10,22 @@
 #include "OpenSSLCertificate.h"
 #include "OpenSSLException.h"
 
-OpenSSLCertificate::OpenSSLCertificate() {
+OpenSSLCertificate::OpenSSLCertificate() : x509Certificate{nullptr} {
     // TODO: create Selfsigned certificate
+}
+
+OpenSSLCertificate::OpenSSLCertificate(const OpenSSLCertificate &openSslCertificate) {
+    this->x509Certificate = openSslCertificate.x509Certificate;
+    X509_up_ref(this->x509Certificate);
+}
+
+OpenSSLCertificate & OpenSSLCertificate::operator=(const OpenSSLCertificate &openSslCertificate) {
+    if (this->x509Certificate) {
+        X509_free(this->x509Certificate);
+    }
+    this->x509Certificate = openSslCertificate.x509Certificate;
+    X509_up_ref(this->x509Certificate);
+    return *this;
 }
 
 OpenSSLCertificate::OpenSSLCertificate(const X509 *x509) {
@@ -21,10 +35,10 @@ OpenSSLCertificate::OpenSSLCertificate(const X509 *x509) {
     }
 }
 
-bool OpenSSLCertificate::verify(const OpenSSLCertificate *issuerCA) const {
+bool OpenSSLCertificate::verify(const OpenSSLCertificate &issuerCA) const {
     EVP_PKEY *pkey = NULL;
 
-    if ((pkey = X509_get0_pubkey(issuerCA->getX509())) == NULL) {
+    if ((pkey = X509_get0_pubkey(issuerCA.getX509())) == NULL) {
         throw OpenSSLException(ERR_get_error());
     }
     int i = X509_verify(x509Certificate, pkey);
@@ -39,7 +53,7 @@ const X509* OpenSSLCertificate::getX509() const {
     return x509Certificate;
 }
 
-const std::string OpenSSLCertificate::getPEM() {
+const std::string OpenSSLCertificate::getPEM() const {
     BIO *bioMem = BIO_new(BIO_s_mem());
 
     if (!PEM_write_bio_X509(bioMem, x509Certificate)) {
@@ -56,7 +70,7 @@ OpenSSLCertificate::~OpenSSLCertificate() {
     X509_free(x509Certificate);
 }
 
-const std::string OpenSSLCertificate::getCommonName() {
+const std::string OpenSSLCertificate::getCommonName() const {
     X509_NAME *x509Name = X509_get_subject_name(x509Certificate);
     int lastpos = -1;
     lastpos = X509_NAME_get_index_by_NID(x509Name, NID_commonName, lastpos);

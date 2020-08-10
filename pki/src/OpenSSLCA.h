@@ -30,13 +30,13 @@ public:
      * @param certificateRequest a certificate request object
      * @return a certificate as an OpenSSLCertificate object
      */
-    std::unique_ptr<OpenSSLCertificate> certify(const OpenSSLCertificateRequest *certificateRequest);
+    std::unique_ptr<OpenSSLCertificate> certify(const OpenSSLCertificateRequest &certificateRequest);
 
     /**
      * Get the Certification Authority certificate of the object
      * @return a certificate as an OpenSSLCertificate object
      */
-    const OpenSSLCertificate *getCertificate();
+    const OpenSSLCertificate &getCertificate() const;
 
     /**
      * Destructor freeing the OpenSSL structures
@@ -47,7 +47,7 @@ private:
 
     OpenSSLKey keyPair;
 
-    std::unique_ptr<OpenSSLCertificate> caCertificate;
+    OpenSSLCertificate caCertificate;
 
     long serialNumber;
 };

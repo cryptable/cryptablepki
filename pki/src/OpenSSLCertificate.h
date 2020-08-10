@@ -16,17 +16,21 @@ class OpenSSLCertificate {
 public:
     OpenSSLCertificate();
 
+    OpenSSLCertificate(const OpenSSLCertificate &openSslCertificate);
+
+    OpenSSLCertificate &operator=(const OpenSSLCertificate &openSslCertificate);
+
     OpenSSLCertificate(const X509 *x509);
 
     ~OpenSSLCertificate();
 
-    bool verify(const OpenSSLCertificate *issuerCA) const;
+    bool verify(const OpenSSLCertificate &issuerCA) const;
 
     const X509 *getX509() const;
 
-    const std::string getPEM();
+    const std::string getPEM() const;
 
-    const std::string getCommonName();
+    const std::string getCommonName() const;
 
 private:
     X509 *x509Certificate;

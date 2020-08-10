@@ -17,7 +17,7 @@ TEST_CASE( "OpenSSLCATests", "[success]" ) {
         OpenSSLCA openSslca(dname, 2048);
 
 	    // Assert
-        REQUIRE(openSslca.getCertificate()->verify(openSslca.getCertificate()));
+        REQUIRE(openSslca.getCertificate().verify(openSslca.getCertificate()));
     }
 
     SECTION( "Sign Certificate Request" ) {
@@ -28,7 +28,7 @@ TEST_CASE( "OpenSSLCATests", "[success]" ) {
         OpenSSLCertificateRequest openSslCertificateRequest(dname_req, 2048);
 
         // Act
-        auto certificate = openSslca.certify(&openSslCertificateRequest);
+        auto certificate = openSslca.certify(openSslCertificateRequest);
 
         // Assert
         REQUIRE(certificate->verify(openSslca.getCertificate()));

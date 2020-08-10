@@ -14,6 +14,12 @@
 class OpenSSLCertificateRequest {
 
 public:
+    OpenSSLCertificateRequest();
+
+    OpenSSLCertificateRequest(const OpenSSLCertificateRequest &openSslCertificateRequest);
+
+    OpenSSLCertificateRequest &operator=(const OpenSSLCertificateRequest &openSslCertificateRequest);
+
     OpenSSLCertificateRequest(const std::string &pemRequest);
 
     OpenSSLCertificateRequest(const char *req, size_t reqLg);
@@ -21,6 +27,8 @@ public:
     OpenSSLCertificateRequest(const std::string &dname, size_t bitLength);
 
     const X509_REQ *getX509_REQ() const;
+
+    const OpenSSLKey &getKeyPair();
 
     bool verify();
 

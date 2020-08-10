@@ -22,6 +22,23 @@ public:
     OpenSSLKey();
 
     /**
+     * constructor from openssl EVP_PKEY
+     */
+    OpenSSLKey(EVP_PKEY *evpPkey);
+
+    /**
+     * Copy constructor
+     * @param openSslKey
+     */
+    OpenSSLKey(const OpenSSLKey &openSslKey);
+
+    /**
+     * Copy assignment
+     * @param openSslKey
+     */
+    OpenSSLKey& operator=(const OpenSSLKey &openSslKey);
+
+    /**
      * Constructor where you can define the RSA bit length
      * @param keyBitLength
      */
@@ -31,7 +48,9 @@ public:
      * Get the key pair pointer
      * @return
      */
-    const EVP_PKEY *getKeyPair();
+    const EVP_PKEY *getKeyPair() const;
+
+    size_t getKeyBitlength() const;
 
     /**
      * Destructor

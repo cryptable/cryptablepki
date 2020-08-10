@@ -11,6 +11,10 @@
 #include "OpenSSLCertificate.h"
 #include "OpenSSLX509Name.h"
 
+OpenSSLCertificateRequest::OpenSSLCertificateRequest() : certificateRequest{nullptr}{
+
+}
+
 OpenSSLCertificateRequest::OpenSSLCertificateRequest(const char *req, size_t reqLg) {
     certificateRequest = d2i_X509_REQ(NULL, reinterpret_cast<const unsigned char **>(&req), reqLg);
     if (certificateRequest == NULL) {
@@ -55,6 +59,21 @@ OpenSSLCertificateRequest::OpenSSLCertificateRequest(const std::string &dname, s
     }
 }
 
+OpenSSLCertificateRequest::OpenSSLCertificateRequest(const OpenSSLCertificateRequest &openSslCertificateRequest) {
+    this->keyPair = openSslCertificateRequest.keyPair;
+    this->certificateRequest = X509_REQ_dup(openSslCertificateRequest.certificateRequest);
+}
+
+OpenSSLCertificateRequest & OpenSSLCertificateRequest::operator=(
+        const OpenSSLCertificateRequest &openSslCertificateRequest) {
+    if (this->certificateRequest) {
+        X509_REQ_free(this->certificateRequest);
+    }
+    this->keyPair = openSslCertificateRequest.keyPair;
+    this->certificateRequest = X509_REQ_dup(openSslCertificateRequest.certificateRequest);
+    return *this;
+}
+
 bool OpenSSLCertificateRequest::verify() {
     EVP_PKEY *pkey = NULL;
 
@@ -71,6 +90,10 @@ bool OpenSSLCertificateRequest::verify() {
 
 const X509_REQ *OpenSSLCertificateRequest::getX509_REQ() const {
     return certificateRequest;
+}
+
+const OpenSSLKey &OpenSSLCertificateRequest::getKeyPair() {
+    return keyPair;
 }
 
 OpenSSLCertificateRequest::~OpenSSLCertificateRequest() {

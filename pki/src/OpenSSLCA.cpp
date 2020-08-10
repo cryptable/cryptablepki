@@ -89,18 +89,18 @@ OpenSSLCA::OpenSSLCA(const std::string &rootName, int bitLength) : serialNumber{
     if (!X509_sign_ctx(x509Certificate.get(), mdctx.get())) {
         throw OpenSSLException(ERR_get_error());
     }
-    caCertificate = std::unique_ptr<OpenSSLCertificate>(new OpenSSLCertificate(x509Certificate.get()));
+    caCertificate = OpenSSLCertificate(x509Certificate.get());
 }
 
-std::unique_ptr<OpenSSLCertificate> OpenSSLCA::certify(const OpenSSLCertificateRequest *certificateRequest) {
+std::unique_ptr<OpenSSLCertificate> OpenSSLCA::certify(const OpenSSLCertificateRequest &certificateRequest) {
 
     auto x509Certificate = std::unique_ptr<X509,std::function<void(X509 *ptr)>>(X509_new(), X509_free );
     if (!x509Certificate) {
         throw std::bad_alloc();
     }
-    X509_set_subject_name(x509Certificate.get(), X509_REQ_get_subject_name(certificateRequest->getX509_REQ()));
-    X509_set_issuer_name(x509Certificate.get(), X509_get_subject_name(caCertificate->getX509()));
-    X509_set_pubkey(x509Certificate.get(), X509_REQ_get0_pubkey((X509_REQ *)certificateRequest->getX509_REQ()));
+    X509_set_subject_name(x509Certificate.get(), X509_REQ_get_subject_name(certificateRequest.getX509_REQ()));
+    X509_set_issuer_name(x509Certificate.get(), X509_get_subject_name(caCertificate.getX509()));
+    X509_set_pubkey(x509Certificate.get(), X509_REQ_get0_pubkey((X509_REQ *)certificateRequest.getX509_REQ()));
     if (X509_gmtime_adj(X509_getm_notBefore(x509Certificate.get()), 0) == NULL) {
         throw OpenSSLException(ERR_get_error());
     }
@@ -127,8 +127,8 @@ std::unique_ptr<OpenSSLCertificate> OpenSSLCA::certify(const OpenSSLCertificateR
     return certificate;
 }
 
-const OpenSSLCertificate * OpenSSLCA::getCertificate() {
-    return caCertificate.get();
+const OpenSSLCertificate &OpenSSLCA::getCertificate() const {
+    return caCertificate;
 }
 
 OpenSSLCA::~OpenSSLCA() {

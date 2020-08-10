@@ -9,8 +9,7 @@
 #include "OpenSSLKey.h"
 #include "OpenSSLException.h"
 
-OpenSSLKey::OpenSSLKey() {
-    OpenSSLKey(2048);
+OpenSSLKey::OpenSSLKey() : OpenSSLKey(2048) {
 }
 
 OpenSSLKey::OpenSSLKey(size_t keyBitLength) : bitLength{keyBitLength}, keyPair{nullptr} {
@@ -39,8 +38,34 @@ OpenSSLKey::OpenSSLKey(size_t keyBitLength) : bitLength{keyBitLength}, keyPair{n
     EVP_PKEY_CTX_free(ctx);
 }
 
-const EVP_PKEY * OpenSSLKey::getKeyPair() {
+OpenSSLKey::OpenSSLKey(EVP_PKEY *evpPkey) {
+    this->keyPair = evpPkey;
+    this->bitLength = EVP_PKEY_bits(evpPkey);
+    EVP_PKEY_up_ref(this->keyPair);
+}
+
+OpenSSLKey::OpenSSLKey(const OpenSSLKey &openSslKey) {
+    this->bitLength = openSslKey.bitLength;
+    this->keyPair = openSslKey.keyPair;
+    EVP_PKEY_up_ref(this->keyPair);
+}
+
+OpenSSLKey & OpenSSLKey::operator=(const OpenSSLKey &openSslKey) {
+    if (this->keyPair) {
+        EVP_PKEY_free(this->keyPair);
+    }
+    this->bitLength = openSslKey.bitLength;
+    this->keyPair = openSslKey.keyPair;
+    EVP_PKEY_up_ref(this->keyPair);
+    return *this;
+}
+
+const EVP_PKEY * OpenSSLKey::getKeyPair() const {
     return keyPair;
+}
+
+size_t OpenSSLKey::getKeyBitlength() const {
+    return bitLength;
 }
 
 OpenSSLKey::~OpenSSLKey() {

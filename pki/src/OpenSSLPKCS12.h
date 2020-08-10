@@ -18,6 +18,7 @@
  */
 class OpenSSLPKCS12 {
 public:
+
     /**
      * Create a PKCS12 structure
      * @param certificate
@@ -25,17 +26,52 @@ public:
      * @param openSslKey
      * @param password
      */
-    OpenSSLPKCS12(OpenSSLCertificate &certificate,
-                  OpenSSLCA &openSslca,
-                  OpenSSLKey &openSslKey,
-                  const std::string &password);
+    explicit OpenSSLPKCS12(const OpenSSLCertificate &certificate,
+                           const OpenSSLCertificate &openSslca,
+                           const OpenSSLKey &openSslKey,
+                           const std::string &password);
 
+    /**
+     * Decode a PKCS12 memory structure
+     * @param pkcs12
+     * @param pkcs12Lg
+     * @param password
+     */
+    explicit OpenSSLPKCS12(const char *pkcs12Buf,
+                           size_t pkcs12BufLg,
+                           const std::string &password);
+
+    /**
+     * Get the PKCS12 file
+     * @return
+     */
     std::vector<unsigned char> getPKCS12();
+
+    /**
+     * Get the certificate from PKCS12
+     * @return
+     */
+    const OpenSSLCertificate &getCertificate() const;
+
+    /**
+     * Get the CA chain from PKCS12
+     * @return
+     */
+    const std::vector<OpenSSLCertificate> &getCAs() const;
+
+    /**
+     * Get the Private key from PKCS12
+     * @return
+     */
+    const OpenSSLKey &getPrivateKey() const;
 
     ~OpenSSLPKCS12();
 
 private:
     PKCS12 *pkcs12;
+    OpenSSLCertificate certificate;
+    std::vector<OpenSSLCertificate> caCertificates;
+    OpenSSLKey keyPair;
 };
 
 
