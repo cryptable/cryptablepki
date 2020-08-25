@@ -15,6 +15,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: setup virtual environment
       run: |
+        apt-get install python3-venv
         python3 -m venv myvenv
         venv\Scripts\activate
     - name: setup development environment
