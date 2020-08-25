@@ -27,7 +27,7 @@ jobs:
         mkdir build
         cd build
         conan install ..
-        cmake ..
+        cmake .. -DCONAN=1
         cmake --build .
     - name: run unittests of library
       run: |
