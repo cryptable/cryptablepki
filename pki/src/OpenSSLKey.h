@@ -9,6 +9,7 @@
 
 
 #include <openssl/ossl_typ.h>
+#include "OpenSSLCertificate.h"
 
 /**
  * EVP_KEY wrapper
@@ -25,6 +26,26 @@ public:
      * constructor from openssl EVP_PKEY
      */
     OpenSSLKey(EVP_PKEY *evpPkey);
+
+    /**
+     * Create RSA key from its components
+     * @param hexModulus
+     * @param hexExponent
+     * @param hexPrivate
+     * @param hexP
+     * @param hexQ
+     * @param hexDP
+     * @param hexDQ
+     * @param hexIQMP
+     */
+    OpenSSLKey(const std::string &hexModulus,
+               const std::string &hexExponent,
+               const std::string &hexPrivate,
+               const std::string &hexP,
+               const std::string &hexQ,
+               const std::string &hexDP,
+               const std::string &hexDQ,
+               const std::string &hexIQMP);
 
     /**
      * Copy constructor

@@ -13,9 +13,22 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: setup virtual environment
+      run: |
+        python3 -m venv myvenv
+        venv\Scripts\activate
     - name: setup development environment
-      run: python3 1-setup-dev.py
+      run: python3 1-setup-dev-conan.py
     - name: build the library
-      run: cd pki && mkdir build && cd build && cmake .. && cmake --build .
+      run: |
+        cd pki
+        mkdir build
+        cd build
+        conan install ..
+        cmake ..
+        make --build .
     - name: run unittests of library
-      run: cd pki && cd build && ./test/tests
+      run: |
+        cd pki
+        cd build 
+        ./bin/tests
