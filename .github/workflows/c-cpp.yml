@@ -28,7 +28,7 @@ jobs:
         cd build
         conan install ..
         cmake ..
-        make --build .
+        cmake --build .
     - name: run unittests of library
       run: |
         cd pki
