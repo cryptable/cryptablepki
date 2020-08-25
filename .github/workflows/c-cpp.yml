@@ -13,13 +13,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: setup virtual environment
-      run: |
-        sudo apt-get install python3-venv
-        python3 -m venv myvenv
-        venv\Scripts\activate
+    - name: Set up Python v3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Upgrade pip
+      run: python -m pip install --upgrade pip
     - name: setup development environment
-      run: python3 1-setup-dev-conan.py
+      run: python 1-setup-dev-conan.py
     - name: build the library
       run: |
         cd pki
