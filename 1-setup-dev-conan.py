@@ -1,7 +1,7 @@
 import subprocess
 
 def install_conan():
-    subprocess.run('py -m pip install conan', shell=True)
+    subprocess.run('python -m pip install conan', shell=True)
 
 def run_scripts():
     install_conan()
